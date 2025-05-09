@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - EYE</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #1E3A8A;
+            color: #ffffff;
+            overflow-x: hidden;
+            padding-top: 80px;
+            padding-bottom: 220px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+                padding-bottom: 180px;
+            }
+            
+            .navbar {
+                min-height: 70px;
+            }
+            
+            .logo-img {
+                height: 50px;
+            }
+            
+            .event-card {
+                width: 100%;
+            }
+            
+            .video-bar {
+                bottom: 100px;
+                height: 80px;
+            }
+            
+            .video-thumbnail {
+                width: 120px;
+                height: 70px;
+            }
+            
+            .main-footer {
+                height: 100px;
+            }
+        }
+        
+        /* Mobile menu styles */
+        .mobile-menu-button {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: #1E3A8A;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid #3B82F6;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-link {
+                padding: 0.75rem;
+                text-align: center;
+            }
+        }
+
+        /* Logo Styles */
+        .logo-img {
+            height: 80px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+        .logo-img:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+        
+        /* Card Styles */
+        .event-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .event-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .event-card img {
+            transition: opacity 0.3s ease;
+        }
+        .event-card:hover img {
+            opacity: 0.85;
+        }
+        
+        /* Fade-in animation */
+        .fade-in {
+            animation: fadeInAnimation 0.8s ease-in-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Navbar styles */
+        .navbar {
+            min-height: 100px;
+            background-color: #1E3A8A;
+            border-bottom: 1px solid #3B82F6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .nav-link {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            color: #EFF6FF;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Fixed video bar styles */
+        .video-bar {
+            position: fixed;
+            bottom: 120px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            overflow-x: auto;
+            gap: 15px;
+        }
+        .video-thumbnail {
+            width: 160px;
+            height: 90px;
+            transition: transform 0.3s ease;
+            border-radius: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .video-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Video modal styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-container {
+            width: 80%;
+            max-width: 1000px;
+            position: relative;
+        }
+        .video-container video {
+            width: 100%;
+            max-height: 80vh;
+        }
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        
+        /* Footer styles */
+        .main-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            z-index: 30;
+            background-color: #1E3A8A;
+            border-top: 1px solid #3B82F6;
+        }
+        
+        /* Video controls styles */
+        .video-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="navbar text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="logo.PNG" alt="EYE Logo" class="logo-img mr-4">
+                <span class="text-2xl font-bold text-white hidden md:block">-</span>
+            </div>
+            
+            <!-- Mobile menu button -->
+            <button class="mobile-menu-button md:hidden text-white focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            
+            <!-- Desktop menu -->
+            <div class="nav-links hidden md:flex">
+                <a href="index.html" class="nav-link">EYE-GIZA</a>
+                <a href="leaders.html" class="nav-link">Administrative Structure </a>
+                <a href="events.html" class="nav-link active">Events</a>
+                <a href="about.html" class="nav-link">About UsAbout Us </a>
+                <a href="contact.html" class="nav-link">Contact Us </a>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="nav-links hidden md:hidden">
+            <a href="index.html" class="nav-link block">EYE-GIZA</a>
+            <a href="leaders.html" class="nav-link block">Administrative Structure </a>
+            <a href="events.html" class="nav-link block active">EventsEvents</a>
+            <a href="about.html" class="nav-link block">About Us </a>
+            <a href="contact.html" class="nav-link block">Contact Us </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-center">أحداثنا وفعالياتنا</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Event 1 -->
+            <div class="event-card fade-in">
+                <a href="#" class="block group" onclick="openVideoModal('4.mp4'); return false;">
+                    <video class="w-full h-48 object-cover" poster="thumbnail.jpg" controls>
+                        <source src="4.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديوهات.
+                    </video>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2 group-hover:text-blue-300 transition-colors">ورشة العمل التقنية</h3>
+                        <p class="text-sm text-blue-200 mb-3">22 فبراير 2024 - ورشة برمجة وتطوير</p>
+                        <span class="inline-block bg-blue-600 group-hover:bg-blue-700 text-white text-xs font-bold px-3 py-1 rounded-full transition-colors">
+                            مشاهدة الفيديو
+                        </span>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Event 2 -->
+            <div class="event-card fade-in" style="animation-delay: 0.2s;">
+                <a href="#" class="block group" onclick="openVideoModal('4.mp4'); return false;">
+                    <video class="w-full h-48 object-cover" poster="thumbnail.jpg" controls>
+                        <source src="4.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديوهات.
+                    </video>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2 group-hover:text-blue-300 transition-colors">ورشة العمل التقنية</h3>
+                        <p class="text-sm text-blue-200 mb-3">22 فبراير 2024 - ورشة برمجة وتطوير</p>
+                        <span class="inline-block bg-blue-600 group-hover:bg-blue-700 text-white text-xs font-bold px-3 py-1 rounded-full transition-colors">
+                            مشاهدة الفيديو
+                        </span>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Add more events as needed -->
+        </div>
+    </main>
+
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-container">
+            <span class="close-modal" onclick="closeVideoModal()">&times;</span>
+            <div class="relative">
+                <video id="videoPlayer" controls class="w-full">
+                    <source id="videoSource" type="video/mp4">
+                    متصفحك لا يدعم تشغيل الفيديوهات.
+                </video>
+                
+                <!-- Custom Controls -->
+                <div class="video-controls">
+                    <button class="control-btn" onclick="document.getElementById('videoPlayer').play()">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <button class="control-btn" onclick="document.getElementById('videoPlayer').pause()">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <input type="range" min="0" max="100" value="0" class="w-1/2" id="progressBar">
+                    <button class="control-btn" onclick="document.getElementById('videoPlayer').muted = !document.getElementById('videoPlayer').muted">
+                        <i class="fas fa-volume-up" id="volumeIcon"></i>
+                    </button>
+                </div>
+                
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="control-btn" onclick="zoomVideo(1.2)">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="control-btn" onclick="zoomVideo(1)">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                </div>
+                
+                <!-- Fullscreen Button -->
+                <button class="control-btn fullscreen-btn" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Footer -->
+    <footer class="main-footer text-white">
+        <div class="container h-full mx-auto flex flex-col items-center justify-center px-4">
+            <div class="flex flex-wrap gap-3 md:gap-6 mb-2 justify-center">
+                <a href="index.html" class="text-sm hover:text-blue-300">EYE-GIZA</a>
+                <a href="leaders.html" class="text-sm hover:text-blue-300">Administrative Structure </a>
+                <a href="events.html" class="text-sm hover:text-blue-300">Events</a>
+                <a href="about.html" class="text-sm hover:text-blue-300"> About Us</a>
+                <a href="contact.html" class="text-sm hover:text-blue-300">Contact Us </a>
+            </div>
+            <p class="text-xs md:text-sm">&copy; 2025 EYE. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Video modal functions
+        function openVideoModal(videoUrl) {
+            const modal = document.getElementById('videoModal');
+            const videoSource = document.getElementById('videoSource');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            videoSource.src = videoUrl;
+            videoPlayer.load();
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Play the video automatically when modal opens
+            videoPlayer.play().catch(e => console.log("Autoplay prevented:", e));
+            
+            // Update progress bar
+            videoPlayer.addEventListener('timeupdate', updateProgressBar);
+            
+            // Update volume icon
+            videoPlayer.addEventListener('volumechange', updateVolumeIcon);
+        }
+        
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            videoPlayer.pause();
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Remove event listeners
+            videoPlayer.removeEventListener('timeupdate', updateProgressBar);
+            videoPlayer.removeEventListener('volumechange', updateVolumeIcon);
+        }
+        
+        // Close modal when clicking outside the video
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                closeVideoModal();
+            }
+        });
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const progressBar = document.getElementById('progressBar');
+            const value = (100 / videoPlayer.duration) * videoPlayer.currentTime;
+            progressBar.value = value;
+            
+            // Seek video when progress bar is clicked
+            progressBar.addEventListener('input', function() {
+                const seekTime = videoPlayer.duration * (progressBar.value / 100);
+                videoPlayer.currentTime = seekTime;
+            });
+        }
+        
+        // Update volume icon
+        function updateVolumeIcon() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const volumeIcon = document.getElementById('volumeIcon');
+            
+            if (videoPlayer.muted || videoPlayer.volume === 0) {
+                volumeIcon.className = 'fas fa-volume-mute';
+            } else if (videoPlayer.volume < 0.5) {
+                volumeIcon.className = 'fas fa-volume-down';
+            } else {
+                volumeIcon.className = 'fas fa-volume-up';
+            }
+        }
+        
+        // Zoom video function
+        function zoomVideo(scale) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.style.transform = `scale(${scale})`;
+            videoPlayer.style.transformOrigin = 'center center';
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            if (!document.fullscreenElement) {
+                if (videoPlayer.requestFullscreen) {
+                    videoPlayer.requestFullscreen();
+                } else if (videoPlayer.webkitRequestFullscreen) {
+                    videoPlayer.webkitRequestFullscreen();
+                } else if (videoPlayer.msRequestFullscreen) {
+                    videoPlayer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
